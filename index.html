@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For You ❤️</title>
     <style>
         :root {
             --vibe-intensity: 0px;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            user-select: none;
         }
 
         body {
@@ -16,7 +22,6 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            /* Powdery Pink Background with Red Outline Hearts Pattern */
             background-color: #ffeef2;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 30 Q65 5 90 30 T50 80 Q35 55 10 30 T50 30' fill='none' stroke='%23ffb3c1' stroke-width='3' opacity='0.4'/%3E%3C/svg%3E");
             font-family: 'Comic Sans MS', 'cursive', sans-serif;
@@ -24,17 +29,25 @@
             flex-direction: column;
         }
 
-        /* The New SVG Heart */
-        #heart-svg {
+        /* Wrapper handles the Size/Scaling */
+        #heart-wrapper {
+            position: relative;
             width: 150px;
             height: 150px;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+
+        /* SVG handles the Vibration */
+        #heart-svg {
+            width: 100%;
+            height: 100%;
             cursor: pointer;
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
             fill: url(#heart-gradient);
-            /* Apply the vibration animation */
-            animation: vibrate 0.1s infinite linear;
-            /* Start with no vibration */
+            animation: vibrate 0.05s infinite linear;
             transform: translate(0, 0);
+            touch-action: manipulation; 
         }
 
         @keyframes vibrate {
@@ -45,7 +58,6 @@
             100% { transform: translate(calc(var(--vibe-intensity) * -1), calc(var(--vibe-intensity) * -1)); }
         }
 
-        /* Floating Message Text */
         #message-box {
             position: absolute;
             top: 15%;
@@ -61,7 +73,6 @@
             transition: opacity 0.5s;
         }
 
-        /* Tiny Floating Hearts from clicking */
         .tiny-heart {
             position: absolute;
             color: #ff4d6d;
@@ -76,7 +87,6 @@
             100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
         }
 
-        /* Confetti Particles */
         .confetti {
             position: absolute;
             font-size: 24px;
@@ -85,7 +95,6 @@
             will-change: transform;
         }
 
-        /* Question Card */
         #card {
             display: none;
             text-align: center;
@@ -95,6 +104,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(255, 183, 178, 0.6);
             max-width: 400px;
+            width: 90%;
             z-index: 10;
         }
 
@@ -106,7 +116,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        h2 { color: #d90429; margin-bottom: 20px; }
+        h2 { color: #d90429; margin-bottom: 20px; font-size: 1.5rem; }
 
         .btn-container {
             display: flex;
@@ -142,21 +152,55 @@
             position: absolute;
         }
 
-        /* Final Note */
+        /* Final Note Styling */
         #finalNote {
             display: none;
             text-align: center;
             background: #fff0f3;
-            padding: 30px;
+            padding: 20px;
             border-radius: 20px;
             border: 5px dashed #ff4d6d;
             max-width: 400px;
+            width: 90%;
             z-index: 11;
         }
 
-        #noteText {
-            font-size: 18px;
-            color: #800f2f;
+        #noteText { font-size: 18px; color: #800f2f; margin-bottom: 20px; }
+
+        /* Scratch Card Styling */
+        #scratch-container {
+            position: relative;
+            width: 280px;
+            height: 100px;
+            margin: 0 auto;
+            border: 2px solid #ff4d6d;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: white; /* Fallback */
+        }
+
+        #scratch-prize {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            color: #d90429;
+            font-weight: bold;
+            font-size: 22px;
+            z-index: 1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            cursor: grab;
         }
     </style>
 </head>
@@ -164,19 +208,21 @@
 
     <div id="message-box">Tap the heart! ❤️</div>
 
-    <svg id="heart-svg" viewBox="0 0 32 29.6">
-        <defs>
-            <linearGradient id="heart-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#ff5c8a;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#d90429;stop-opacity:1" />
-            </linearGradient>
-        </defs>
-        <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
-        c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
-    </svg>
+    <div id="heart-wrapper">
+        <svg id="heart-svg" viewBox="0 0 32 29.6">
+            <defs>
+                <linearGradient id="heart-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ff5c8a;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#d90429;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+            c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+        </svg>
+    </div>
 
     <div id="card">
-        <img src="https://via.placeholder.com/300x200/ffccd5/ff4d6d?text=Insert+Cute+Photo+Here" alt="Us" class="custom-img">
+        <img src="img3.jpeg" alt="Us" class="custom-img">
         <h2>Will you be my valentine?</h2>
         <div class="btn-container">
             <button id="yesBtn">Yes, my forever valentine!</button>
@@ -185,8 +231,13 @@
     </div>
 
     <div id="finalNote">
-        <img src="https://via.placeholder.com/300x200/ffccd5/ff4d6d?text=Our+Future" alt="Us" class="custom-img">
-        <p id="noteText">I knew you would say yes! ❤️ Can't wait to celebrate with you.</p>
+        <img src="img5.jpeg" alt="Us" class="custom-img">
+        <p id="noteText">I knew you would say yes my queen 👑<br>Can't wait to celebrate this valentines day with you my forever valentine ❤️</p>
+        
+        <div id="scratch-container">
+            <div id="scratch-prize">✈️ 1 Week Trip to Goa! 🌴</div>
+            <canvas id="scratch-canvas"></canvas>
+        </div>
     </div>
 
     <script>
@@ -194,6 +245,7 @@
         let idleTimer;
         const maxClicks = 100;
         
+        const heartWrapper = document.getElementById('heart-wrapper');
         const heartSvg = document.getElementById('heart-svg');
         const messageBox = document.getElementById('message-box');
         const card = document.getElementById('card');
@@ -202,27 +254,32 @@
         const finalNote = document.getElementById('finalNote');
 
         const cheeringMessages = [
-            "Come on you got this!", "Keep tapping!", "Almost there!",
-            "Don't stop now!", "My heart is beating faster!",
-            "Just a little more!", "Yayyyy!", "❤️❤️❤️"
+            "Come on you got this nekoooo!", "Keep tapping baybb!",
+            "Don't stop tapping!", "My heart is beating faster!", "just 2🥺 mole taps",
+            "Just a little more nekoo!", "Yayyyy ❤️❤️❤️ keep tapping!"
         ];
 
         const sadMessages = [
-            "only this much pyall? 😭", "you dont laa mee soo much ? 🥺",
+            "only this much pyall? 😭", "you dont laa mee soo much kyaa ? 🥺",
             "why did you stop? 💔", "tap tap tap please! 😢"
         ];
 
         const explosionEmojis = ['💖', '💕', '💗', '🍫', '🍬', '🍭', '🎉', '✨'];
 
         heartSvg.addEventListener('click', (e) => {
+            if (clicks >= maxClicks) return;
+
             clicks++;
             resetIdleTimer();
             showRandomMessage(cheeringMessages);
             spawnTinyHeart(e.clientX, e.clientY);
 
-            // Calculate vibration intensity based on clicks
-            // Intensity goes from 0px to about 5px
-            let intensity = (clicks / maxClicks) * 5;
+            // Scale
+            let currentScale = 1 + (clicks * 0.015);
+            heartWrapper.style.transform = `scale(${currentScale})`;
+
+            // Intensity
+            let intensity = (clicks / maxClicks) * 8;
             heartSvg.style.setProperty('--vibe-intensity', `${intensity}px`);
 
             if (clicks >= maxClicks) {
@@ -235,8 +292,6 @@
             idleTimer = setTimeout(() => {
                 if (clicks < maxClicks && clicks > 0) {
                     showRandomMessage(sadMessages);
-                    // Drop vibration to zero when idle
-                    heartSvg.style.setProperty('--vibe-intensity', '0px');
                 }
             }, 2000);
         }
@@ -260,17 +315,12 @@
         }
 
         function explode() {
-            heartSvg.style.display = 'none';
+            heartWrapper.style.display = 'none'; 
             messageBox.style.display = 'none';
             document.body.style.backgroundColor = '#ffc2d1';
             clearTimeout(idleTimer);
-            
             launchConfetti();
-            
-            // Delay showing the card a bit so the explosion is visible
-            setTimeout(() => {
-                card.style.display = 'block';
-            }, 500);
+            setTimeout(() => { card.style.display = 'block'; }, 500);
         }
 
         function launchConfetti() {
@@ -284,9 +334,8 @@
                 particle.innerText = emoji;
                 document.body.appendChild(particle);
 
-                // Random velocities for parabolic motion
-                const velocityX = (Math.random() - 0.5) * 20; // Horizontal spread
-                const velocityY = -Math.random() * 25 - 10; // Initial upward pop
+                const velocityX = (Math.random() - 0.5) * 20;
+                const velocityY = -Math.random() * 25 - 10;
                 const gravity = 0.8;
                 
                 let posX = startX;
@@ -297,14 +346,9 @@
                     posX += velocityX;
                     posY += currentVy;
                     currentVy += gravity;
-                    
                     particle.style.transform = `translate(${posX - startX}px, ${posY - startY}px) rotate(${posX}deg)`;
-
-                    if (posY < window.innerHeight + 50) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        particle.remove();
-                    }
+                    if (posY < window.innerHeight + 50) requestAnimationFrame(animate);
+                    else particle.remove();
                 }
                 animate();
             }
@@ -318,7 +362,6 @@
             noBtn.style.left = `${Math.max(10, x)}px`;
             noBtn.style.top = `${Math.max(10, y)}px`;
         }
-
         noBtn.addEventListener('mouseover', moveNoButton);
         noBtn.addEventListener('click', moveNoButton);
         noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
@@ -327,11 +370,78 @@
         yesBtn.addEventListener('click', () => {
             card.style.display = 'none';
             finalNote.style.display = 'block';
-            // Simple final confetti
+            
+            // Initialize the scratch card NOW that the container is visible
+            initScratchCard();
+            
             for(let i=0; i<50; i++) {
                 setTimeout(() => spawnTinyHeart(Math.random() * window.innerWidth, window.innerHeight), i * 50);
             }
         });
+
+        // --- Scratch Card Logic ---
+        function initScratchCard() {
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            const container = document.getElementById('scratch-container');
+            
+            // Set canvas size to match the container
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+
+            // Fill with Silver
+            ctx.fillStyle = '#C0C0C0'; // Silver color
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add "Scratch Me" text
+            ctx.fillStyle = '#555';
+            ctx.font = 'bold 20px "Comic Sans MS"';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("✨ Scratch Here ✨", canvas.width / 2, canvas.height / 2);
+
+            let isDrawing = false;
+
+            function getMousePos(e) {
+                const rect = canvas.getBoundingClientRect();
+                let clientX, clientY;
+                
+                if (e.changedTouches) {
+                    clientX = e.changedTouches[0].clientX;
+                    clientY = e.changedTouches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+
+            function scratch(e) {
+                if (!isDrawing) return;
+                e.preventDefault(); // Stop scrolling on phones
+                
+                const pos = getMousePos(e);
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2); // Brush size
+                ctx.fill();
+            }
+
+            // Mouse Events
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener('mousemove', scratch);
+            canvas.addEventListener('mouseup', () => { isDrawing = false; });
+            canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+            // Touch Events (for Mobile)
+            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener('touchmove', scratch);
+            canvas.addEventListener('touchend', () => { isDrawing = false; });
+        }
     </script>
 </body>
 </html>
