@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <style>
+        :root {
+            --vibe-intensity: 0px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* Powdery Pink Background with Red Outline Hearts Pattern */
+            background-color: #ffeef2;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 30 Q65 5 90 30 T50 80 Q35 55 10 30 T50 30' fill='none' stroke='%23ffb3c1' stroke-width='3' opacity='0.4'/%3E%3C/svg%3E");
+            font-family: 'Comic Sans MS', 'cursive', sans-serif;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        /* The New SVG Heart */
+        #heart-svg {
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+            fill: url(#heart-gradient);
+            /* Apply the vibration animation */
+            animation: vibrate 0.1s infinite linear;
+            /* Start with no vibration */
+            transform: translate(0, 0);
+        }
+
+        @keyframes vibrate {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(var(--vibe-intensity), var(--vibe-intensity)); }
+            50% { transform: translate(calc(var(--vibe-intensity) * -1), var(--vibe-intensity)); }
+            75% { transform: translate(var(--vibe-intensity), calc(var(--vibe-intensity) * -1)); }
+            100% { transform: translate(calc(var(--vibe-intensity) * -1), calc(var(--vibe-intensity) * -1)); }
+        }
+
+        /* Floating Message Text */
+        #message-box {
+            position: absolute;
+            top: 15%;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            color: #d90429;
+            font-weight: bold;
+            pointer-events: none;
+            height: 30px;
+            text-shadow: 1px 1px 0px white;
+            z-index: 5;
+            transition: opacity 0.5s;
+        }
+
+        /* Tiny Floating Hearts from clicking */
+        .tiny-heart {
+            position: absolute;
+            color: #ff4d6d;
+            font-size: 20px;
+            animation: floatUp 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+
+        /* Confetti Particles */
+        .confetti {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 100;
+            will-change: transform;
+        }
+
+        /* Question Card */
+        #card {
+            display: none;
+            text-align: center;
+            background: #fff0f3;
+            padding: 30px;
+            border: 8px solid #ffccd5;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 183, 178, 0.6);
+            max-width: 400px;
+            z-index: 10;
+        }
+
+        .custom-img {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 { color: #d90429; margin-bottom: 20px; }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            height: 50px;
+            position: relative;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s;
+            font-family: inherit;
+        }
+
+        button:active { transform: scale(0.95); }
+
+        #yesBtn { 
+            background-color: #ff4d6d; 
+            color: white; 
+            box-shadow: 0 4px 10px rgba(255, 77, 109, 0.4);
+        }
+        
+        #noBtn { 
+            background-color: #ffccd5; 
+            color: #d90429; 
+            position: absolute;
+        }
+
+        /* Final Note */
+        #finalNote {
+            display: none;
+            text-align: center;
+            background: #fff0f3;
+            padding: 30px;
+            border-radius: 20px;
+            border: 5px dashed #ff4d6d;
+            max-width: 400px;
+            z-index: 11;
+        }
+
+        #noteText {
+            font-size: 18px;
+            color: #800f2f;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="message-box">Tap the heart! ❤️</div>
+
+    <svg id="heart-svg" viewBox="0 0 32 29.6">
+        <defs>
+            <linearGradient id="heart-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ff5c8a;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#d90429;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+        <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+        c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+    </svg>
+
+    <div id="card">
+        <img src="https://via.placeholder.com/300x200/ffccd5/ff4d6d?text=Insert+Cute+Photo+Here" alt="Us" class="custom-img">
+        <h2>Will you be my valentine?</h2>
+        <div class="btn-container">
+            <button id="yesBtn">Yes, my forever valentine!</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <div id="finalNote">
+        <img src="https://via.placeholder.com/300x200/ffccd5/ff4d6d?text=Our+Future" alt="Us" class="custom-img">
+        <p id="noteText">I knew you would say yes! ❤️ Can't wait to celebrate with you.</p>
+    </div>
+
+    <script>
+        let clicks = 0;
+        let idleTimer;
+        const maxClicks = 100;
+        
+        const heartSvg = document.getElementById('heart-svg');
+        const messageBox = document.getElementById('message-box');
+        const card = document.getElementById('card');
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const finalNote = document.getElementById('finalNote');
+
+        const cheeringMessages = [
+            "Come on you got this!", "Keep tapping!", "Almost there!",
+            "Don't stop now!", "My heart is beating faster!",
+            "Just a little more!", "Yayyyy!", "❤️❤️❤️"
+        ];
+
+        const sadMessages = [
+            "only this much pyall? 😭", "you dont laa mee soo much ? 🥺",
+            "why did you stop? 💔", "tap tap tap please! 😢"
+        ];
+
+        const explosionEmojis = ['💖', '💕', '💗', '🍫', '🍬', '🍭', '🎉', '✨'];
+
+        heartSvg.addEventListener('click', (e) => {
+            clicks++;
+            resetIdleTimer();
+            showRandomMessage(cheeringMessages);
+            spawnTinyHeart(e.clientX, e.clientY);
+
+            // Calculate vibration intensity based on clicks
+            // Intensity goes from 0px to about 5px
+            let intensity = (clicks / maxClicks) * 5;
+            heartSvg.style.setProperty('--vibe-intensity', `${intensity}px`);
+
+            if (clicks >= maxClicks) {
+                explode();
+            }
+        });
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                if (clicks < maxClicks && clicks > 0) {
+                    showRandomMessage(sadMessages);
+                    // Drop vibration to zero when idle
+                    heartSvg.style.setProperty('--vibe-intensity', '0px');
+                }
+            }, 2000);
+        }
+
+        function showRandomMessage(array) {
+            const text = array[Math.floor(Math.random() * array.length)];
+            messageBox.innerText = text;
+            messageBox.style.opacity = 1;
+        }
+
+        function spawnTinyHeart(x, y) {
+            const tiny = document.createElement('div');
+            tiny.classList.add('tiny-heart');
+            tiny.innerHTML = '❤️';
+            tiny.style.left = `${x}px`;
+            tiny.style.top = `${y}px`;
+            const randomX = (Math.random() - 0.5) * 50;
+            tiny.style.transform = `translate(${randomX}px, 0)`;
+            document.body.appendChild(tiny);
+            setTimeout(() => tiny.remove(), 1000);
+        }
+
+        function explode() {
+            heartSvg.style.display = 'none';
+            messageBox.style.display = 'none';
+            document.body.style.backgroundColor = '#ffc2d1';
+            clearTimeout(idleTimer);
+            
+            launchConfetti();
+            
+            // Delay showing the card a bit so the explosion is visible
+            setTimeout(() => {
+                card.style.display = 'block';
+            }, 500);
+        }
+
+        function launchConfetti() {
+            const startX = window.innerWidth / 2;
+            const startY = window.innerHeight / 2;
+
+            for (let i = 0; i < 100; i++) {
+                const emoji = explosionEmojis[Math.floor(Math.random() * explosionEmojis.length)];
+                const particle = document.createElement('div');
+                particle.classList.add('confetti');
+                particle.innerText = emoji;
+                document.body.appendChild(particle);
+
+                // Random velocities for parabolic motion
+                const velocityX = (Math.random() - 0.5) * 20; // Horizontal spread
+                const velocityY = -Math.random() * 25 - 10; // Initial upward pop
+                const gravity = 0.8;
+                
+                let posX = startX;
+                let posY = startY;
+                let currentVy = velocityY;
+
+                function animate() {
+                    posX += velocityX;
+                    posY += currentVy;
+                    currentVy += gravity;
+                    
+                    particle.style.transform = `translate(${posX - startX}px, ${posY - startY}px) rotate(${posX}deg)`;
+
+                    if (posY < window.innerHeight + 50) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                }
+                animate();
+            }
+        }
+
+        // --- No Button Logic ---
+        function moveNoButton() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${Math.max(10, x)}px`;
+            noBtn.style.top = `${Math.max(10, y)}px`;
+        }
+
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('click', moveNoButton);
+        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
+
+        // --- Yes Button Logic ---
+        yesBtn.addEventListener('click', () => {
+            card.style.display = 'none';
+            finalNote.style.display = 'block';
+            // Simple final confetti
+            for(let i=0; i<50; i++) {
+                setTimeout(() => spawnTinyHeart(Math.random() * window.innerWidth, window.innerHeight), i * 50);
+            }
+        });
+    </script>
+</body>
+</html>
